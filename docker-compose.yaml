@@ -2,38 +2,50 @@ version: "3"
 services:
   hub:
     image: selenium/hub:3.14
+    ports:
+      - "4444:4444"
   chrome:
-    image: selenium/node-chrome:3.14      
+    image: selenium/node-chrome:3.14
     depends_on:
       - hub
     environment:
       - HUB_HOST=hub
   firefox:
     image: selenium/node-firefox:3.14
-    shm_size: '1gb'   
+    shm_size: '1gb'
     depends_on:
       - hub
     environment:
       - HUB_HOST=hub
-  search-module:
-    image: vinsdocker/selenium-docker
-    depends_on:
-      - chrome
-      - firefox
+  search-module-firefox:
+    image: madhan0809/selenium-docker
     environment:
-      - HUB_HOST=hub
       - BROWSER=firefox
+      - HUB_HOST=hub
       - MODULE=search-module.xml
     volumes:
-      - ./output/search-result:/usr/share/udemy/test-output      
-  book-flight-module:
-    image: vinsdocker/selenium-docker
-    depends_on:
-      - chrome
-      - firefox
+      - ./search-module-firefox-result:/usr/share/docker/test-output
+  search-module-chrome:
+    image: madhan0809/selenium-docker
     environment:
-      - HUB_HOST=hub
       - BROWSER=chrome
+      - HUB_HOST=hub
+      - MODULE=search-module.xml
+    volumes:
+      - ./search-module-chrome-result:/usr/share/docker/test-output
+  flight-module-chrome:
+    image: madhan0809/selenium-docker
+    environment:
+      - BROWSER=chrome
+      - HUB_HOST=hub
       - MODULE=book-flight-module.xml
     volumes:
-      - ./output/book-result:/usr/share/udemy/test-output   
+      - ./book-flight-chrome-result:/usr/share/docker/test-output
+  flight-module-firefox:
+    image: madhan0809/selenium-docker
+    environment:
+      - BROWSER=firefox
+      - HUB_HOST=hub
+      - MODULE=book-flight-module.xml
+    volumes:
+      - ./book-flight-firefox-result:/usr/share/docker/test-output
